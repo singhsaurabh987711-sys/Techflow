@@ -12,7 +12,7 @@ package.domain = org.techflow
 source.dir = .
 source.main = main.py
 
-requirements = python3==3.14.2,kivy==2.3.0
+requirements = python3==3.11.9,kivy==2.3.0
 
 orientation = portrait
 fullscreen = 0
