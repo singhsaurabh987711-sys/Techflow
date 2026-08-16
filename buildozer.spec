@@ -17,7 +17,7 @@ source.dir = .
 source.main = main.py
 
 # (list) Application requirements
-requirements = python3,kivy==2.3.0
+requirements = python3==3.11.9,kivy==2.3.0
 
 # (str) Supported orientation
 orientation = portrait
