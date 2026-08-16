@@ -16,41 +16,30 @@ jobs:
 
       - name: Check project files
         run: |
-          echo "Current directory:"
           pwd
-          echo "Files:"
           ls -la
-          echo "Project files:"
-          find . -maxdepth 2 -type f -print
-
-      - name: Check Buildozer spec
-        run: |
+          test -f main.py
           test -f buildozer.spec
-          echo "buildozer.spec found successfully!"
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            git \
-            zip \
-            unzip \
-            openjdk-17-jdk \
-            python3-pip \
-            autoconf \
-            libtool \
-            pkg-config \
-            zlib1g-dev \
-            libncurses5-dev \
-            libncursesw5-dev \
-            cmake \
-            libffi-dev \
-            libssl-dev
+            git zip unzip openjdk-17-jdk \
+            autoconf libtool pkg-config \
+            zlib1g-dev libncurses5-dev libncursesw5-dev \
+            cmake libffi-dev libssl-dev
 
-      - name: Install Buildozer
+      - name: Install Python dependencies
         run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install buildozer cython
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install "cython<3"
+          python -m pip install buildozer
 
       - name: Build Techflow APK
         run: |
@@ -62,3 +51,4 @@ jobs:
           name: Techflow-APK
           path: bin/*.apk
           if-no-files-found: error
+          
