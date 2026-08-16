@@ -3,6 +3,7 @@
 # (str) Title of your application
 title = Techflow
 version = 1.0
+android.accept_sdk_license = True
 # (str) Package name
 package.name = techflow
 
