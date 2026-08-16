@@ -43,7 +43,7 @@ jobs:
 
       - name: Build Techflow APK
         run: |
-          buildozer android debug
+          buildozer android debug 2>&1 | tail -n 100
 
       - name: Upload Techflow APK
         uses: actions/upload-artifact@v4
@@ -51,4 +51,3 @@ jobs:
           name: Techflow-APK
           path: bin/*.apk
           if-no-files-found: error
-          
