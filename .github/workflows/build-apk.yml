@@ -39,11 +39,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip setuptools wheel
           python -m pip install "cython<3"
-          python -m pip install buildozer
+          python -m6 pip install buildozer
 
       - name: Build Techflow APK
         run: |
-          buildozer android debug 2>&1 | tail -n 100
+          buildozer android debug 
 
       - name: Upload Techflow APK
         uses: actions/upload-artifact@v4
@@ -51,3 +51,4 @@ jobs:
           name: Techflow-APK
           path: bin/*.apk
           if-no-files-found: error
+
