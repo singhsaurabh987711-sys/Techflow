@@ -56,3 +56,4 @@ jobs:
           name: Techflow-APK
           path: bin/*.apk
           if-no-files-found: error
+          
