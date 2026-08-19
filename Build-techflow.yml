@@ -23,28 +23,44 @@ jobs:
         run: |
           python --version
           python3 --version
+          which python
+          which python3
 
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
             git zip unzip openjdk-17-jdk \
-            autoconf libtool pkg-config \
+            autoconf automake libtool pkg-config \
             zlib1g-dev libncurses5-dev libncursesw5-dev \
-            cmake libffi-dev libssl-dev
+            cmake libffi-dev libssl-dev \
+            libltdl-dev
 
       - name: Install Python build tools
         run: |
           python -m pip install --upgrade pip
-          python -m pip install setuptools wheel
-          python -m pip install "cython<3"
-          python -m pip install buildozer
+          python -m pip install "setuptools<76" "wheel<1.0"
+          python -m pip install "cython==0.29.36"
+          python -m pip install "buildozer==1.5.0"
 
-      - name: Verify Buildozer environment
+      - name: Install compatible python-for-android
         run: |
+          python -m pip install "python-for-android==2024.1.21"
+
+      - name: Verify build environment
+        run: |
+          echo "========== PYTHON =========="
           python --version
+          python3 --version
+
+          echo "========== BUILDOZER =========="
           buildozer --version
+
+          echo "========== CYTHON =========="
           cython --version
+
+          echo "========== P4A =========="
+          python -m pythonforandroid.toolchain --help | head -20
 
       - name: Clean old Buildozer files
         run: |
@@ -55,7 +71,9 @@ jobs:
         shell: bash
         run: |
           set +e
+
           buildozer android debug 2>&1 | tee build.log
+
           BUILD_EXIT=${PIPESTATUS[0]}
 
           echo ""
@@ -65,7 +83,7 @@ jobs:
 
           echo ""
           echo "========== IMPORTANT ERRORS =========="
-          grep -inE "error:|ERROR|failed|FAILED|fatal|Exception|Traceback" build.log | tail -100 || true
+          grep -inE "error:|ERROR|failed|FAILED|fatal|Exception|Traceback|Build failed" build.log | tail -150 || true
 
           exit $BUILD_EXIT
 
@@ -80,5 +98,5 @@ jobs:
       - name: Check APK
         if: success()
         run: |
-          echo "APK files:"
+          echo "========== APK FILES =========="
           find bin -type f -name "*.apk" -print
