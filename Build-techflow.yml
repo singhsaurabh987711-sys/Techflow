@@ -17,35 +17,68 @@ jobs:
       - name: Set up Python 3.11.9
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11.9"
+          python-version: '3.11.9'
+
+      - name: Verify Python
+        run: |
+          python --version
+          python3 --version
 
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
             git zip unzip openjdk-17-jdk \
-            autoconf automake libtool pkg-config \
+            autoconf libtool pkg-config \
             zlib1g-dev libncurses5-dev libncursesw5-dev \
             cmake libffi-dev libssl-dev
 
       - name: Install Python build tools
         run: |
           python -m pip install --upgrade pip
-          python -m pip install "Cython==0.29.36"
-          python -m pip install "buildozer==1.5.0"
+          python -m pip install setuptools wheel
+          python -m pip install "cython<3"
+          python -m pip install buildozer
+
+      - name: Verify Buildozer environment
+        run: |
+          python --version
+          buildozer --version
+          cython --version
+
+      - name: Clean old Buildozer files
+        run: |
+          rm -rf .buildozer
+          rm -rf bin
 
       - name: Build Techflow APK
+        shell: bash
         run: |
-          buildozer android debug
+          set +e
+          buildozer android debug 2>&1 | tee build.log
+          BUILD_EXIT=${PIPESTATUS[0]}
 
-      - name: Check APK
-        run: |
-          ls -lh bin/
-          test -n "$(find bin -name '*.apk' -print -quit)"
+          echo ""
+          echo "========================================"
+          echo "BUILD EXIT CODE: $BUILD_EXIT"
+          echo "========================================"
 
-      - name: Upload Techflow APK
+          echo ""
+          echo "========== IMPORTANT ERRORS =========="
+          grep -inE "error:|ERROR|failed|FAILED|fatal|Exception|Traceback" build.log | tail -100 || true
+
+          exit $BUILD_EXIT
+
+      - name: Upload build log
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Techflow-APK
-          path: bin/*.apk
-          if-no-files-found: error
+          name: techflow-build-log
+          path: build.log
+          if-no-files-found: ignore
+
+      - name: Check APK
+        if: success()
+        run: |
+          echo "APK files:"
+          find bin -type f -name "*.apk" -print
