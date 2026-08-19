@@ -8,7 +8,7 @@ source.dir = .
 source.include_exts = py,png,jpg,jpeg,kv,atlas,json
 source.main = main.py
 
-version = 1.0
+version = 2.0
 
 requirements = python3,kivy==2.3.0
 
